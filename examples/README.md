@@ -1,4 +1,4 @@
-# SPL Course Workspace
+# SPL Course Student Env
 
 Welcome! This is your starter workspace for the SPL course. It includes a pre-configured development environment with all the tools you need.
 

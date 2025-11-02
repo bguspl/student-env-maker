@@ -1,5 +1,5 @@
 {
-	"name": "BGU SPL Student Workspace",
+	"name": "BGU SPL Student Env",
 	"image": "{{IMAGE_NAME}}:{{IMAGE_TAG}}",
 	"remoteUser": "spl",
 	"customizations": {
