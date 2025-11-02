@@ -64,6 +64,29 @@ RUN useradd -m -s /bin/bash -G sudo spl && \
     echo "spl ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/spl && \
     chmod 0440 /etc/sudoers.d/spl
 
+# Remove the sudo hint message that appears on login
+RUN touch /home/spl/.sudo_as_admin_successful && \
+    chown spl:spl /home/spl/.sudo_as_admin_successful
+
+# Create welcome message for students
+RUN echo '#!/bin/bash' > /etc/profile.d/welcome.sh && \
+    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "═══════════════════════════════════════════════════════════"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "  Welcome to BGU SPL Student Env"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "═══════════════════════════════════════════════════════════"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "Available tools:"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "  • C/C++: gcc-13, g++-13, clang, cmake"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "  • Java: OpenJDK 21 (Temurin)"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "  • Python: 3.12"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "  • SQLite: sqlite3"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
+    echo 'echo "Happy coding! 🚀"' >> /etc/profile.d/welcome.sh && \
+    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
+    chmod +x /etc/profile.d/welcome.sh && \
+    echo '. /etc/profile.d/welcome.sh' >> /home/spl/.bashrc && \
+    chown spl:spl /home/spl/.bashrc
+
 USER spl
 
 WORKDIR /home/spl

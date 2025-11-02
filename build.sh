@@ -180,7 +180,14 @@ echo "Building Docker image via compose (version: ${TARGET_VERSION})"
 IMAGE_FULL="${IMAGE_NAME}:${TARGET_VERSION}"
 if docker image inspect "$IMAGE_FULL" >/dev/null 2>&1; then
   docker tag "$IMAGE_FULL" "${IMAGE_NAME}:latest" || true
-  echo "Docker image built and tagged: $IMAGE_FULL -> ${IMAGE_NAME}:latest"
+  echo ""
+  echo "═══════════════════════════════════════════════════════════"
+  echo "✅ Build complete!"
+  echo "═══════════════════════════════════════════════════════════"
+  echo "Docker image built and tagged:"
+  echo "  • $IMAGE_FULL"
+  echo "  • ${IMAGE_NAME}:latest"
+  echo ""
 else
   echo "Warning: Expected image $IMAGE_FULL not found after compose build." >&2
 fi

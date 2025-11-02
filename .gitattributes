@@ -10,3 +10,7 @@ Dockerfile text eol=lf
 *.md text eol=lf
 *.gitmodules text eol=lf
 *.properties text eol=lf
+.env text eol=lf
+
+# Git internal files should keep their native line endings
+.git/** -text
