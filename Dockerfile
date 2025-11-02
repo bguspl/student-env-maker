@@ -65,11 +65,11 @@ RUN useradd -m -s /bin/bash -G sudo spl && \
     chmod 0440 /etc/sudoers.d/spl
 
 # Remove the sudo hint message that appears on login
-# Create both .sudo_as_admin_successful and .hushlogin to suppress the message
+# The message is triggered by /etc/bash.bashrc checking for .sudo_as_admin_successful
+# We create this file AND also comment out the sudo hint in /etc/bash.bashrc
 RUN touch /home/spl/.sudo_as_admin_successful /home/spl/.hushlogin && \
     chown spl:spl /home/spl/.sudo_as_admin_successful /home/spl/.hushlogin && \
-    echo '# Suppress sudo hint' >> /home/spl/.bashrc && \
-    echo 'export SUDO_PROMPT=""' >> /home/spl/.bashrc
+    sed -i '/# sudo hint/,/^fi$/d' /etc/bash.bashrc
 
 # Create welcome message for students - add to .bashrc so it shows in terminals
 RUN echo '' >> /home/spl/.bashrc && \
