@@ -33,7 +33,7 @@ Once the container starts, you'll have a full development environment ready to u
 Run the smoke test to verify everything works:
 
 ```bash
-bash run-examples.sh
+bash run.sh
 ```
 
 This will compile and run:

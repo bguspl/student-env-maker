@@ -3,7 +3,7 @@
 This repository builds and publishes the course’s student environment Docker image and maintains the embedded student starter workspace under `examples/` (as a submodule).
 
 - Image: `ghcr.io/<owner>/student-env` (e.g., `ghcr.io/bguspl/student-env`)
-- Architectures: `linux/amd64` and `linux/arm64` (built by GitHub Actions)
+- Architectures: `linux/amd64` and `linux/arm64` (built locally with QEMU)
 - Tooling: C/C++ (gcc-13, clang, cmake), Java (Temurin 21 + maven), Python 3.12, SQLite
 
 Maintainers: see `BUILD.md` for multi-arch builds, versioning, and troubleshooting.
@@ -17,8 +17,6 @@ bash build.sh --yes
 # Bump version and build (updates VERSION in .env)
 bash build.sh --bump --yes
 ```
-
-Note: Multi-arch releases are built on GitHub Actions (local QEMU is intentionally not supported on Ubuntu 22.04 arm64).
 
 Use compose directly (uses `.env` written by the build script):
 
@@ -40,19 +38,19 @@ cd ~/examples
 bash run-examples.sh
 ```
 
-## Release (multi-arch via GitHub Actions)
+## Build and push multi-arch images to GHCR
 
-Push to GitHub to trigger the automated multi-arch build:
+For production releases (amd64 + arm64):
 
 ```bash
-# Bump version and push
-bash build.sh --bump
-git add .env
-git commit -m "Bump version to $(awk -F '=' '/^\s*VERSION\s*=/{gsub(/\r/,"",$2); gsub(/\s+/,"",$2); print $2}' .env)"
-git push
+# Build and push multi-arch images
+./push.sh --yes
+
+# Or bump version and push
+./push.sh --bump --yes
 ```
 
-GitHub Actions will automatically build for both amd64 and arm64 and push to GHCR. See `BUILD.md` for details.
+This uses Docker Buildx with QEMU emulation to build both architectures locally and pushes to GitHub Container Registry. See `BUILD.md` for details.
 
 ## Student template (submodule)
 

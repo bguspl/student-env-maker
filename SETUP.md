@@ -196,18 +196,16 @@ Once your Dev Container is running, open a terminal in VS Code (`Ctrl+`` or `Cmd
 
 ```bash
 # Check tools are available
-docker --version
 gcc --version
 java -version
 python3 --version
 
-# Try building an example
-cd ~/examples/Threads/hello
-make
-./hello
+# Try running the examples
+cd ~/examples
+./run.sh
 ```
 
-You should see "Hello, World!" output.
+You should see "Hello, World!" output from each language.
 
 ---
 

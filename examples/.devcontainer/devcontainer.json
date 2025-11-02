@@ -1,6 +1,6 @@
 {
 	"name": "BGU SPL Student Workspace",
-	"image": "ghcr.io/bguspl/student-env:0.3",
+	"image": "ghcr.io/bguspl/student-env:0.0",
 	"remoteUser": "spl",
 	"customizations": {
 		"vscode": {

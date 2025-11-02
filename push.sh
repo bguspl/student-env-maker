@@ -1,45 +1,46 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Push the built Docker image to Docker Hub (or another registry).
-# Note: If you use 'build.sh --multi-arch', the image is pushed automatically during build.
-# This script is useful for:
-#  - Re-tagging and pushing locally built images (non-multi-arch builds)
-#  - Pushing to a different registry after a local build
-# Usage: ./push.sh [--repo namespace/image] [--image local-name] [--no-latest] [--yes]
+# Build multi-arch (amd64 + arm64) Docker images using QEMU and push to GHCR.
+# This script builds both architectures locally using buildx + QEMU emulation,
+# then pushes the multi-arch manifest to the registry.
+# Usage: ./push.sh [--bump] [--no-latest] [--yes]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/.env"
 
-# Prefer IMAGE_NAME from .env (written by build.sh); fallback to Docker Hub name
+# Prefer IMAGE_NAME from .env (written by build.sh); fallback to GHCR
 IMAGE_FROM_ENV=$(awk -F '=' '/^\s*IMAGE_NAME\s*=/{gsub(/\r/,"",$2); gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}' "$ENV_FILE" | tail -n1)
-DEFAULT_IMAGE="${IMAGE_FROM_ENV:-ghcr.io/bguspl/student-env}"
-LOCAL_IMAGE="$DEFAULT_IMAGE"
-REMOTE_REPO="$DEFAULT_IMAGE"
+IMAGE_NAME="${IMAGE_FROM_ENV:-ghcr.io/bguspl/student-env}"
 PUSH_LATEST=true
 ASSUME_YES=false
+BUMP=false
 
 usage() {
   cat <<-USAGE
-Usage: $(basename "$0") [--repo namespace/image] [--image local-name] [--no-latest] [--yes]
+Usage: $(basename "$0") [--bump] [--no-latest] [--yes]
+
+Builds multi-arch (amd64 + arm64) Docker images using QEMU and pushes to GHCR.
 
 Options:
-  --repo <name>     Target repository (default: $DEFAULT_IMAGE)
-  --image <name>    Local image name to read from (default: $DEFAULT_IMAGE)
+  --bump            Bump version before building (increments VERSION in .env)
   --no-latest       Skip pushing the 'latest' tag
-  --yes             Skip confirmation prompt
+  --yes             Skip confirmation prompts
   -h, --help        Show this help message
+
+Environment:
+  IMAGE_NAME from .env (default: ghcr.io/bguspl/student-env)
+  VERSION from .env
+
+Note: Requires 'gh' CLI for authentication (run 'gh auth login' first).
+      ARM64 build uses QEMU emulation (~10-15 min build time).
 USAGE
 }
 
 while [[ ${#} -gt 0 ]]; do
   case "$1" in
-    --repo)
-      [[ $# -ge 2 ]] || { echo "--repo requires an argument" >&2; exit 2; }
-      REMOTE_REPO="$2"; shift 2 ;;
-    --image)
-      [[ $# -ge 2 ]] || { echo "--image requires an argument" >&2; exit 2; }
-      LOCAL_IMAGE="$2"; shift 2 ;;
+    --bump)
+      BUMP=true; shift ;;
     --no-latest)
       PUSH_LATEST=false; shift ;;
     --yes)
@@ -54,18 +55,44 @@ while [[ ${#} -gt 0 ]]; do
 done
 
 if [[ ! -f "$ENV_FILE" ]]; then
-  echo ".env not found at: $ENV_FILE" >&2
-  exit 2
+  echo ".env not found; initializing with VERSION=0.1" >&2
+  echo "VERSION=0.1" > "$ENV_FILE"
+  echo "IMAGE_NAME=$IMAGE_NAME" >> "$ENV_FILE"
 fi
 
-VERSION=$(awk -F '=' '/^\s*VERSION\s*=/{gsub(/\r/,"",$2); gsub(/\s+/,"",$2); print $2}' "$ENV_FILE" | tail -n1)
-if [[ -z "$VERSION" ]]; then
-  echo "VERSION not set in $ENV_FILE" >&2
-  exit 2
+# Read VERSION from .env
+CURRENT_VERSION=$(awk -F '=' '/^\s*VERSION\s*=/{gsub(/\r/,"",$2); gsub(/\s+/,"",$2); print $2}' "$ENV_FILE" | tail -n1)
+if [[ -z "$CURRENT_VERSION" ]]; then
+  echo "VERSION not found in .env; initializing to 0.1" >&2
+  CURRENT_VERSION="0.1"
+  echo "VERSION=$CURRENT_VERSION" > "$ENV_FILE"
+  echo "IMAGE_NAME=$IMAGE_NAME" >> "$ENV_FILE"
 fi
 
-SOURCE_REF="$LOCAL_IMAGE:$VERSION"
-TARGET_REF="$REMOTE_REPO:$VERSION"
+# Bump version if requested
+TARGET_VERSION="$CURRENT_VERSION"
+if $BUMP; then
+  IFS='.' read -ra parts <<< "$CURRENT_VERSION"
+  last_idx=$((${#parts[@]} - 1))
+  if [[ ${parts[$last_idx]} =~ ^[0-9]+$ ]]; then
+    parts[$last_idx]=$((parts[$last_idx] + 1))
+    TARGET_VERSION="${parts[0]}"
+    for i in "${parts[@]:1}"; do
+      TARGET_VERSION+=".${i}"
+    done
+  else
+    TARGET_VERSION=$(awk -v v="$CURRENT_VERSION" 'BEGIN{printf "%.1f", v+0.1}')
+  fi
+  echo "Bumping version: $CURRENT_VERSION → $TARGET_VERSION"
+  # Update .env
+  if grep -qE "^\s*VERSION\s*=" "$ENV_FILE"; then
+    sed -i "s|^\s*VERSION\s*=.*|VERSION=$TARGET_VERSION|" "$ENV_FILE"
+  else
+    echo "VERSION=$TARGET_VERSION" >> "$ENV_FILE"
+  fi
+else
+  echo "Using version: $TARGET_VERSION"
+fi
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker CLI not found in PATH. Install Docker or make sure it's available." >&2
@@ -73,40 +100,74 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 
 if ! docker info >/dev/null 2>&1; then
-  echo "Docker daemon not reachable. Start Docker Desktop or your daemon before pushing." >&2
+  echo "Docker daemon not reachable. Start Docker Desktop or your daemon before building." >&2
   exit 5
 fi
 
-if ! docker image inspect "$SOURCE_REF" >/dev/null 2>&1; then
-  echo "Local image '$SOURCE_REF' not found. Build the image first (e.g., ./build.sh)." >&2
-  exit 4
+if ! command -v gh >/dev/null 2>&1; then
+  echo "gh CLI not found. Install it from https://cli.github.com/ and run 'gh auth login'." >&2
+  exit 6
 fi
 
-echo "Preparing to push image version: $VERSION"
-echo "  Local image:  $SOURCE_REF"
-echo "  Remote image: $TARGET_REF"
-if $PUSH_LATEST; then
-  echo "  Also pushing: $REMOTE_REPO:latest"
+# Check gh auth
+if ! gh auth status >/dev/null 2>&1; then
+  echo "Not authenticated with gh. Run: gh auth login" >&2
+  exit 7
 fi
+
+echo "Preparing to build and push multi-arch images (amd64 + arm64 via QEMU)"
+echo "  Image name: $IMAGE_NAME"
+echo "  Version:    $TARGET_VERSION"
+if $PUSH_LATEST; then
+  echo "  Tags:       $IMAGE_NAME:$TARGET_VERSION, $IMAGE_NAME:latest"
+else
+  echo "  Tags:       $IMAGE_NAME:$TARGET_VERSION"
+fi
+echo ""
+echo "Note: ARM64 build uses QEMU emulation (~10-15 min build time expected)"
 
 if ! $ASSUME_YES; then
-  read -r -p "Proceed with docker push? [y/N] " answer || true
+  read -r -p "Proceed with multi-arch build and push to GHCR? [y/N] " answer || true
   case "$answer" in
     [Yy]|[Yy][Ee][Ss]) : ;;
     *) echo "Aborted by user."; exit 0 ;;
   esac
 fi
 
-# Retag if the remote repo differs from the local name
-if [[ "$REMOTE_REPO" != "$LOCAL_IMAGE" ]]; then
-  docker tag "$SOURCE_REF" "$TARGET_REF"
+# Login to GHCR using gh token
+echo "Logging in to ghcr.io..."
+gh auth token | docker login ghcr.io -u "$(gh api user -q .login)" --password-stdin
+
+# Ensure buildx builder with QEMU support exists
+if ! docker buildx inspect multiarch-builder >/dev/null 2>&1; then
+  echo "Creating buildx builder with QEMU support..."
+  docker buildx create --name multiarch-builder --driver docker-container --use
+  docker buildx inspect --bootstrap
 fi
 
-docker push "$TARGET_REF"
-
+# Build and push multi-arch image
+TAGS="-t $IMAGE_NAME:$TARGET_VERSION"
 if $PUSH_LATEST; then
-  docker tag "$SOURCE_REF" "$REMOTE_REPO:latest"
-  docker push "$REMOTE_REPO:latest"
+  TAGS="$TAGS -t $IMAGE_NAME:latest"
 fi
 
-echo "Push complete."
+echo ""
+echo "Building multi-arch image (this will take 10-15 minutes for ARM64 via QEMU)..."
+docker buildx build --platform linux/amd64,linux/arm64 \
+  $TAGS \
+  --push \
+  --cache-from type=registry,ref=$IMAGE_NAME:buildcache \
+  --cache-to type=registry,ref=$IMAGE_NAME:buildcache,mode=max \
+  "$SCRIPT_DIR"
+
+echo ""
+echo "✅ Multi-arch build and push complete!"
+echo "Verifying multi-arch manifest..."
+docker buildx imagetools inspect "$IMAGE_NAME:$TARGET_VERSION"
+
+echo ""
+echo "Images pushed:"
+echo "  • $IMAGE_NAME:$TARGET_VERSION"
+if $PUSH_LATEST; then
+  echo "  • $IMAGE_NAME:latest"
+fi
