@@ -1,0 +1,7 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Use IMAGE_NAME from .env (falls back to GHCR path if not set by build.sh)
+    image: "${IMAGE_NAME}:${VERSION}"
