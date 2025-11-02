@@ -69,23 +69,25 @@ RUN useradd -m -s /bin/bash -G sudo spl && \
 RUN touch /home/spl/.sudo_as_admin_successful /home/spl/.hushlogin && \
     chown spl:spl /home/spl/.sudo_as_admin_successful /home/spl/.hushlogin
 
-# Create welcome message for students
-RUN echo '#!/bin/bash' > /etc/profile.d/welcome.sh && \
-    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "═══════════════════════════════════════════════════════════"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "  Welcome to BGU SPL Student Env"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "═══════════════════════════════════════════════════════════"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "Available tools:"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "  • C/C++: gcc-13, g++-13, clang, cmake"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "  • Java: OpenJDK 21 (Temurin)"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "  • Python: 3.12"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "  • SQLite: sqlite3"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
-    echo 'echo "Happy coding! 🚀"' >> /etc/profile.d/welcome.sh && \
-    echo 'echo ""' >> /etc/profile.d/welcome.sh && \
-    chmod +x /etc/profile.d/welcome.sh && \
-    echo '. /etc/profile.d/welcome.sh' >> /home/spl/.bashrc && \
+# Create welcome message for students - add to .bashrc so it shows in terminals
+RUN echo '' >> /home/spl/.bashrc && \
+    echo '# Welcome message' >> /home/spl/.bashrc && \
+    echo 'if [ -z "$VSCODE_WELCOME_SHOWN" ]; then' >> /home/spl/.bashrc && \
+    echo '  export VSCODE_WELCOME_SHOWN=1' >> /home/spl/.bashrc && \
+    echo '  echo ""' >> /home/spl/.bashrc && \
+    echo '  echo "═══════════════════════════════════════════════════════════"' >> /home/spl/.bashrc && \
+    echo '  echo "  Welcome to BGU SPL Student Env"' >> /home/spl/.bashrc && \
+    echo '  echo "═══════════════════════════════════════════════════════════"' >> /home/spl/.bashrc && \
+    echo '  echo ""' >> /home/spl/.bashrc && \
+    echo '  echo "Available tools:"' >> /home/spl/.bashrc && \
+    echo '  echo "  • C/C++: gcc-13, g++-13, clang, cmake"' >> /home/spl/.bashrc && \
+    echo '  echo "  • Java: OpenJDK 21 (Temurin)"' >> /home/spl/.bashrc && \
+    echo '  echo "  • Python: 3.12"' >> /home/spl/.bashrc && \
+    echo '  echo "  • SQLite: sqlite3"' >> /home/spl/.bashrc && \
+    echo '  echo ""' >> /home/spl/.bashrc && \
+    echo '  echo "Happy coding! 🚀"' >> /home/spl/.bashrc && \
+    echo '  echo ""' >> /home/spl/.bashrc && \
+    echo 'fi' >> /home/spl/.bashrc && \
     chown spl:spl /home/spl/.bashrc
 
 USER spl
