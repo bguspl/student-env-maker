@@ -1,0 +1,7 @@
+# Ignore working tree of embedded student repo
+submodules/examples-template/
+
+# OS/Editor junk
+.DS_Store
+Thumbs.db
+.vscode/

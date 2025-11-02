@@ -1,0 +1,12 @@
+# Normalize line endings to LF in repo; keep scripts and configs consistent across OSes
+* text=auto
+
+# Force LF for shell scripts, Dockerfiles, YAML, JSON, etc.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.gitmodules text eol=lf
+*.properties text eol=lf
