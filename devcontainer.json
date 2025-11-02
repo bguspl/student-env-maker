@@ -37,7 +37,7 @@
 
     // 4. POST-CREATE COMMAND
     // This will run and show its output in the log
-    "postCreateCommand": "bash -c 'if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo \"No requirements.txt found, skipping pip install.\"; fi; echo \"\"; echo \"═══════════════════════════════════════════════════════════\"; echo \"  Welcome to BGU SPL Student Env\"; echo \"═══════════════════════════════════════════════════════════\"; echo \"\"; echo \"Available tools:\"; echo \"  • C/C++: gcc-13, g++-13, clang, cmake\"; echo \"  • Java: OpenJDK 21 (Temurin)\"; echo \"  • Python: 3.12\"; echo \"  • SQLite: sqlite3\"; echo \"\"; echo \"✅ Container is ready! Happy coding! 🚀\"; echo \"\"'",
+    "postCreateCommand": "bash -c 'if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo \"No requirements.txt found, skipping pip install.\"; fi; echo \"\"; echo \"═══════════════════════════════════════════════════════════\"; echo \"  Welcome to BGU SPL Student Env (v${STUDENT_ENV_VERSION})\"; echo \"═══════════════════════════════════════════════════════════\"; echo \"\"; echo \"Available tools:\"; echo \"  • C/C++: gcc-13, g++-13, clang, cmake\"; echo \"  • Java: OpenJDK 21 (Temurin)\"; echo \"  • Python: 3.12\"; echo \"  • SQLite: sqlite3\"; echo \"\"; echo \"✅ Container is ready! Happy coding! 🚀\"; echo \"\"'",
 
     // 5. USER
     // Connects as the 'spl' user

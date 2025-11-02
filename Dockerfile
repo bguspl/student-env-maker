@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+# Build argument for version (passed from docker-compose.yml)
+ARG VERSION=dev
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install core tooling and language runtimes required for the course.
@@ -72,13 +75,16 @@ RUN touch /home/spl/.sudo_as_admin_successful /home/spl/.hushlogin && \
     sed -i '/# sudo hint/,/^fi$/d' /etc/bash.bashrc
 
 # Create welcome message for students - add to .bashrc so it shows in terminals
+# Store the version in an environment variable
+ENV STUDENT_ENV_VERSION=${VERSION}
+
 RUN echo '' >> /home/spl/.bashrc && \
     echo '# Welcome message' >> /home/spl/.bashrc && \
     echo 'if [ -z "$VSCODE_WELCOME_SHOWN" ]; then' >> /home/spl/.bashrc && \
     echo '  export VSCODE_WELCOME_SHOWN=1' >> /home/spl/.bashrc && \
     echo '  echo ""' >> /home/spl/.bashrc && \
     echo '  echo "═══════════════════════════════════════════════════════════"' >> /home/spl/.bashrc && \
-    echo '  echo "  Welcome to BGU SPL Student Env"' >> /home/spl/.bashrc && \
+    echo '  echo "  Welcome to BGU SPL Student Env (v${STUDENT_ENV_VERSION})"' >> /home/spl/.bashrc && \
     echo '  echo "═══════════════════════════════════════════════════════════"' >> /home/spl/.bashrc && \
     echo '  echo ""' >> /home/spl/.bashrc && \
     echo '  echo "Available tools:"' >> /home/spl/.bashrc && \
