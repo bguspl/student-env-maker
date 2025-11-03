@@ -10,8 +10,7 @@ else
   echo "g++ not found"
 fi
 
-echo ""
-echo "--- Java ---"
+echo -e "\n--- Java ---"
 if command -v javac >/dev/null 2>&1; then
   javac Hello.java
   java Hello
@@ -19,8 +18,7 @@ else
   echo "javac not found"
 fi
 
-echo ""
-echo "--- Python ---"
+echo -e "\n--- Python ---"
 if command -v python3.12 >/dev/null 2>&1; then
   python3.12 hello.py
 elif command -v python3 >/dev/null 2>&1; then
@@ -29,8 +27,7 @@ else
   echo "Python not found"
 fi
 
-echo ""
-echo "--- SQLite ---"
+echo -e "\n--- SQLite ---"
 if command -v sqlite3 >/dev/null 2>&1; then
   sqlite3 test.db <<'SQL'
 CREATE TABLE IF NOT EXISTS people(id INTEGER PRIMARY KEY, name TEXT);
@@ -41,5 +38,4 @@ else
   echo "sqlite3 not found"
 fi
 
-echo ""
-echo "Done."
+echo -e "\nDone."
