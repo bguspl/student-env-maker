@@ -2,3 +2,15 @@
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Build products and executables (global)
+*.o
+*.out
+*.exe
+*.class
+*.pyc
+__pycache__/
+
+# Common example binaries
+examples/hello
+examples/Hello.class

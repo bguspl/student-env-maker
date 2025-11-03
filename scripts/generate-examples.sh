@@ -80,7 +80,10 @@ grep '"image"' "$TEMP_DEVCONTAINER" | sed 's/^/   /'
 OUTPUT_ZIP="$REPO_ROOT/examples.zip"
 echo -e "\nCreating $OUTPUT_ZIP..."
 cd "$TEMP_DIR"
-zip -r "$OUTPUT_ZIP" examples/ -x "*.git*" "*.DS_Store" "__pycache__/*" "*.pyc" > /dev/null
+# Exclude common build products and executables
+zip -r "$OUTPUT_ZIP" examples/ \
+  -x "*.git*" "*.DS_Store" "__pycache__/*" "*.pyc" \
+  "*.class" "*.o" "*.out" "*.exe" "examples/hello" "examples/Hello.class" "examples/hello.cpp.o" "examples/hello.pyc" > /dev/null
 
 echo -e "\n✅ Generated: examples.zip"
 echo "   Version in zip: $VERSION"
