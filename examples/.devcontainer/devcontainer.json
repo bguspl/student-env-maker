@@ -9,7 +9,8 @@
 				"vscjava.vscode-java-pack",
 				"ms-python.python",
 				"mtxr.sqltools",
-				"mtxr.sqltools-driver-sqlite"
+				"mtxr.sqltools-driver-sqlite",
+				"ms-vsliveshare.vsliveshare"
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "bash"

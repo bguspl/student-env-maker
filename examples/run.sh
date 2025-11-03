@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 
 echo "--- C++ ---"
 if command -v g++ >/dev/null 2>&1; then
-  g++ -std=c++17 hello.cpp -o hello
+  g++ -std=c++23 hello.cpp -o hello
   ./hello
 else
   echo "g++ not found"
