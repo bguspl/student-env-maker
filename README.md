@@ -93,4 +93,4 @@ Run `bash build.sh` without options to see all available commands:
 bash build.sh
 ```
 
-See `BUILD.md` for detailed build information and troubleshooting.
+**See `BUILD.md` for detailed build information and troubleshooting.**

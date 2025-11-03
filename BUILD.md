@@ -157,6 +157,9 @@ Install from https://cli.github.com/
 **"Not authenticated with gh"**  
 Run `gh auth login` and complete browser authentication
 
+**"Permission denied" or "write:packages scope required"**  
+Your GitHub token needs the `write:packages` permission. Run `gh auth refresh -s write:packages` to add the required scope.
+
 **"Docker daemon not reachable"**  
 Start Docker Desktop or check your Docker daemon
 
