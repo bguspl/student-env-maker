@@ -13,11 +13,11 @@ example-command --option value
 To run these commands, open a terminal on your system:
 
 - **Windows:** Open Windows Terminal (uses PowerShell by default)
-- **Mac:** Open Terminal (Applications → Utilities → Terminal)
+- **macOS:** Open Terminal (Applications → Utilities → Terminal)
 
 Then type or paste the command and press Enter.
 
-## Windows
+## Windows Installation
 
 ### Step 1: Install WSL 2 and Ubuntu
 
@@ -136,7 +136,7 @@ code examples/
 
 ---
 
-## Mac
+## Mac Installation (arm64 arch.)
 
 ### Step 1: Install Visual Studio Code
 
@@ -192,26 +192,41 @@ code examples/
 
 ## Verification
 
-Once your Dev Container is running, open a terminal in VS Code (`Ctrl+`` or `Cmd+``) and verify:
+Once the container is up and running you should see the following message and prompt in the VS Code terminal:
+
+```
+═══════════════════════════════════════════════════════════
+  Welcome to BGU SPL Student Env (v1.0)
+═══════════════════════════════════════════════════════════
+
+Available tools:
+  • C/C++: gcc-13, g++-13, clang, cmake
+  • Java: OpenJDK 21 (Temurin)
+  • Python: 3.12
+  • SQLite: sqlite3
+
+Happy coding! 🚀
+
+spl@8914a05235b6:/workspace$
+```
+
+> **Note:** The version number (v1.0) and the number at the prompt (8914a05235b6) may be different.
+
+Run the examples:
 
 ```bash
-# Check tools are available
-gcc --version
-java -version
-python3 --version
-
-# Try running the examples
-cd ~/examples
 ./run.sh
 ```
 
 You should see "Hello, World!" output from each language.
 
+**Happy coding! 🚀**
+
 ---
 
 ## Troubleshooting
 
-### Windows: Virtualization Not Enabled
+### Virtualization Not Enabled (Windows)
 
 **Error:** `WslRegisterDistribution failed with error: 0x80370102`
 
@@ -222,7 +237,7 @@ You should see "Hello, World!" output from each language.
 
 > Note: More info at https://aka.ms/enablevirtualization
 
-### Windows: WSL 2 Not Working
+### WSL 2 Not Working (Windows)
 
 ```PowerShell
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -231,28 +246,30 @@ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /nores
 
 Restart and try again.
 
-### Windows: Docker Permission Denied
+### Docker Permission Denied (Windows)
 
 1. Ensure you ran `sudo usermod -aG docker $USER`
 2. **Completely close** Ubuntu terminal
 3. Reopen and test: `docker run hello-world`
 
-### macOS: Docker Desktop Not Starting
+### Docker Desktop Not Starting (macOS)
 
 1. Check System Preferences → Security & Privacy for blocked items
 2. Grant Full Disk Access: System Preferences → Security & Privacy → Privacy → Full Disk Access → Add Docker
 3. Restart Docker Desktop
 
-### Container Won't Start
+### Container Won't Start (Windows / macOS)
 
 1. Verify Docker is running: `docker info`
 2. Rebuild container: `Ctrl/Cmd+Shift+P` → "Dev Containers: Rebuild Container"
 
-### Performance Issues
+### Performance Issues (Windows)
 
-> Note: **Windows WSL:** Keep code in WSL filesystem (`~/spl-examples`), not Windows (`/mnt/c/...`) for better performance.
+Keep code in WSL filesystem (`~/examples`), not Windows (`/mnt/c/...`) for better performance.
 
-**macOS:** Increase Docker resources in Docker Desktop → Preferences → Resources → Advanced
+### Performance Issues (macOS)
+
+Increase Docker resources in Docker Desktop → Preferences → Resources → Advanced
 
 ---
 
@@ -263,4 +280,3 @@ If issues persist:
 2. Ask your TA or instructor
 3. Include: OS version, exact error message, what you tried
 
-**Ready to code!** See the examples README for how to work with the development environment.

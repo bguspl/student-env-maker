@@ -1,96 +1,96 @@
 # Student Environment Image Maker
 
-This repository builds and publishes the course’s student environment Docker image and maintains the embedded student starter workspace under `examples/` (as a submodule).
+This repository builds and publishes the course's student environment Docker image and maintains the student starter workspace under `examples/`.
 
-- Image: `ghcr.io/<owner>/student-env` (e.g., `ghcr.io/bguspl/student-env`)
-- Architectures: `linux/amd64` and `linux/arm64` (built locally with QEMU)
+- Image: `ghcr.io/bguspl/student-env`
+- Architectures: `linux/amd64` and `linux/arm64`
 - Tooling: C/C++ (gcc-13, clang, cmake), Java (Temurin 21 + maven), Python 3.12, SQLite
 
-Maintainers: see `BUILD.md` for multi-arch builds, versioning, and troubleshooting.
-
-## Local build (single-arch, for testing)
+## Quick Start
 
 ```bash
-# Build with existing version (WSL recommended)
-bash build.sh --yes
+# Build multi-arch image
+bash build.sh -b
 
-# Bump version and build (updates VERSION in .env)
-bash build.sh --bump --yes
+# Build and push to GHCR
+bash build.sh -b -p
+
+# Generate examples.zip for students
+bash build.sh -g
+
+# Do everything (prompts for each step)
+bash build.sh -a
+
+# Do everything without prompts
+bash build.sh -a -y
 ```
 
-Use compose directly (uses `.env` written by the build script):
+For all available options: `bash build.sh -h`
+
+## Modular Scripts
+
+Individual scripts in `scripts/` can be run independently:
 
 ```bash
-docker compose build --pull --progress=plain app
+# Build container image
+bash scripts/build-container.sh
+
+# Push to GitHub Container Registry
+bash scripts/push-to-ghcr.sh
+
+# Generate examples.zip
+bash scripts/generate-examples.sh
 ```
 
-## Smoke test
+Each script supports `--help` for detailed usage.
 
-Start an interactive container and run the example smoke-test script included in the image:
+## Smoke Test
+
+Test the image locally:
 
 ```bash
-# run an interactive container (mount workspace if desired)
-VER=$(awk -F '=' '/^\s*VERSION\s*=/{gsub(/\r/,"",$2); gsub(/\s+/,"",$2); print $2}' .env | tail -n1)
-docker run --rm -it ghcr.io/bguspl/student-env:$VER bash
+# Run an interactive container
+docker run --rm -it ghcr.io/bguspl/student-env:latest bash
 
-# inside container (as user 'spl'):
+# Inside container (as user 'spl'):
 cd ~/examples
-bash run-examples.sh
+bash run.sh
 ```
 
-## Build and push multi-arch images to GHCR
+## Student Template
 
-For production releases (amd64 + arm64):
+The `examples/` folder contains the starter workspace that students will download.
+
+**⚠️ IMPORTANT:** The `examples/.devcontainer/devcontainer.json` file must always use the `:latest` tag for the image:
+
+```json
+"image": "ghcr.io/bguspl/student-env:latest"
+```
+
+**DO NOT** manually change `latest` to a version number. Keep it as `latest` for:
+- Local development and testing
+- Easy updates when rebuilding the image
+
+When you run `bash build.sh --generate`, the script will automatically:
+1. Verify the devcontainer uses `:latest`
+2. Create a temporary copy
+3. Replace `:latest` with the actual version number
+4. Package it into `examples.zip` for students
+
+This way, the repository always uses `:latest` for convenience, but students get a pinned version in the zip file.
+
+## Prerequisites
+
+- Docker Desktop with WSL integration (Windows) or Docker Engine (Linux/Mac)
+- GitHub CLI (`gh`) - Install from https://cli.github.com/
+- Authenticated with GitHub: `gh auth login`
+
+## Build Options
+
+Run `bash build.sh` without options to see all available commands:
 
 ```bash
-# Build and push multi-arch images
-./push.sh --yes
-
-# Or bump version and push
-./push.sh --bump --yes
+bash build.sh
 ```
 
-This uses Docker Buildx with QEMU emulation to build both architectures locally and pushes to GitHub Container Registry. See `BUILD.md` for details.
-
-## Student template (submodule)
-
-- `examples/` behaves like a student starter repository. Update files here as needed (add assignments, starter code, etc.).
-- The Dev Container definition inside `examples/.devcontainer/` is generated from `devcontainer.json.template` using `scripts/generate-devcontainer.sh`.
-- `build.sh` automatically writes `.env` so the image tag always matches the version in that file.
-
-Regenerate manually (for example after editing the template):
-
-```bash
-bash scripts/generate-devcontainer.sh
-
-# or target a different registry/repo
-IMAGE_NAME=ghcr.io/bguspl/student-env bash scripts/generate-devcontainer.sh
-```
-
-### Submodule setup
-
-The `examples/` folder is a Git submodule so it can evolve independently of the image builder. 
-
-After cloning the main repo, run:
-
-```bash
-git submodule update --init --recursive
-```
-
-If your Git blocks the local file protocol for submodules, you might need to allow it just for this clone:
-
-```bash
-git -c protocol.file.allow=always submodule update --init --recursive
-```
-
-To update to the latest student template commit in the submodule:
-
-```bash
-cd examples
-git pull origin master   # or main, depending on the submodule default branch
-cd ..
-git add examples
-git commit -m "Update examples submodule"
-```
-
-Student-facing onboarding lives in the student template repository. This repository is intended for the course staff.
+See `BUILD.md` for detailed build information and troubleshooting.
