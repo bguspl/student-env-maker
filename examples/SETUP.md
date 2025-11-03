@@ -132,7 +132,9 @@ code examples/
 
 `F1` → "Reopen in Container" 
 
->  **Note:** If you did not install Docker in a previous step, let VS Code install it as this stage (VS Code will suggest it)
+>  **Note:** If you did not install Docker in a previous step, let VS Code install it at this stage (VS Code will suggest it)
+
+**Once the container starts, see `README.md` for next steps.**
 
 ---
 
@@ -188,39 +190,11 @@ unzip examples.zip
 code examples/
 ```
 
----
+### Step 7: Reopen in Container
 
-## Verification
+`F1` → "Reopen in Container"
 
-Once the container is up and running you should see the following message and prompt in the VS Code terminal:
-
-```
-═══════════════════════════════════════════════════════════
-  Welcome to BGU SPL Student Env (v1.0)
-═══════════════════════════════════════════════════════════
-
-Available tools:
-  • C/C++: gcc-13, g++-13, clang, cmake
-  • Java: OpenJDK 21 (Temurin)
-  • Python: 3.12
-  • SQLite: sqlite3
-
-Happy coding! 🚀
-
-spl@8914a05235b6:/workspace$
-```
-
-> **Note:** The version number (v1.0) and the number at the prompt (8914a05235b6) may be different.
-
-Run the examples:
-
-```bash
-./run.sh
-```
-
-You should see "Hello, World!" output from each language.
-
-**Happy coding! 🚀**
+**Once the container starts, see `README.md` for next steps.**
 
 ---
 
