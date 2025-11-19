@@ -16,8 +16,8 @@ RUN apt-get update && \
         software-properties-common \
         build-essential \
         cmake \
-        clang \
         valgrind \
+        clang \
         git \
         wget \
         sudo \

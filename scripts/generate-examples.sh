@@ -69,6 +69,10 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 echo "Creating temporary copy..."
 cp -r "$EXAMPLES_DIR" "$TEMP_DIR/examples"
 
+# Copy Dockerfile into .devcontainer folder
+echo "Adding Dockerfile to .devcontainer..."
+cp "$REPO_ROOT/Dockerfile" "$TEMP_DIR/examples/.devcontainer/Dockerfile"
+
 # Replace "latest" with version number in the temporary copy
 TEMP_DEVCONTAINER="$TEMP_DIR/examples/.devcontainer/devcontainer.json"
 sed -i "s|:latest\"|:$VERSION\"|g" "$TEMP_DEVCONTAINER"

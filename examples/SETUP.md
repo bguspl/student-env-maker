@@ -1,6 +1,8 @@
 # Student Development Environment Setup
 
-This guide will help you set up the development environment for SPL course assignments on **Windows 11** and **macOS**. We do not provide instructions for native Linux installations, but you may build the dev container yourself (request the latest Dockerfile from your instructor).
+This guide will help you set up the development environment for SPL course assignments on **Windows 11** and **macOS**. 
+
+> Note: We do not provide instructions for native Linux installations, but you may build the dev container yourself using the Dockerfile in `./devcontainer`.
 
 ## How to Run Commands
 

@@ -163,6 +163,14 @@ Your GitHub token needs the `write:packages` permission. Run `gh auth refresh -s
 **"Docker daemon not reachable"**  
 Start Docker Desktop or check your Docker daemon
 
+**"ERROR [internal] booting buildkit"**
+
+Accompanied by something like that:
+> WARNING: No output specified with docker-container driver. Build result will only remain in the build cache. To push result image into registry use --push or to load image into docker use --load
+ERROR: failed to build: Error response from daemon: invalid mount config for type "bind": bind source path does not exist: /run/desktop/mnt/host/wsl/docker-desktop-bind-mounts/Ubuntu-22.04/f969f076ad437ac0162d56bf356c2a910d8ddd313a6ac1d90246b6b64d06d59a
+
+Run `docker buildx rm multiarch-builder` and run the build again.
+
 **ARM64 build slow**  
 Expected — QEMU emulation can take up to ~15 min build time
 
