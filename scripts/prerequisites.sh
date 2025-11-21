@@ -218,10 +218,45 @@ check_gh_auth() {
     return
   fi
   if gh auth status >/dev/null 2>&1; then
-    print_status "✅ gh auth: logged in"
+    # verify required package scopes are present on the current token
+    local token scopes missing_scopes
+    token=$(gh auth token 2>/dev/null || true)
+    if [[ -z "$token" ]]; then
+      print_status "❌ gh auth: no token available"
+      record_blocker "Run 'gh auth login --scopes \"read:packages,write:packages,delete:packages\"' so the token has package scopes"
+      return
+    fi
+    missing_scopes=()
+    for required in write:packages delete:packages; do
+      if ! gh auth status -t 2>/dev/null | grep -q "$required"; then
+        missing_scopes+=("$required")
+      fi
+    done
+    if ((${#missing_scopes[@]} > 0)); then
+      print_status "❌ gh auth: missing scopes: ${missing_scopes[*]}"
+      record_blocker "Run 'gh auth refresh -s write:packages,delete:packages' to add the required scopes"
+      return
+    fi
+
+    # quick permission probe: try listing the GHCR package; 403 usually means
+    # the token is fine but the user lacks org/package access
+    local user login
+    login=$(gh api user -q .login 2>/dev/null || echo "")
+    if [[ -n "$login" ]]; then
+      if ! gh api \
+        -H "Accept: application/vnd.github+json" \
+        "/orgs/bguspl/packages/container/student-env" \
+        >/dev/null 2>&1; then
+        print_status "❌ gh auth: token has scopes but lacks access to bguspl/student-env"
+        record_blocker "Ask a bguspl org owner to grant you write access to 'bguspl/student-env' repository so you can push images."
+        return
+      fi
+    fi
+
+    print_status "✅ gh auth: logged in with package scopes and access"
   else
     print_status "❌ gh auth status failed"
-    record_blocker "Run 'gh auth login' so the build scripts can access GHCR"
+    record_blocker "Run 'gh auth login --scopes \"write:packages,delete:packages\"' so the build scripts can access GHCR"
   fi
 }
 

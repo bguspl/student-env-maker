@@ -151,7 +151,7 @@ bash build.sh -a -y
 
 1. **Docker Desktop** (with WSL integration if on Windows) or Docker Engine
 2. **GitHub CLI** (`gh`): Install from https://cli.github.com/
-3. **Authenticated**: Run `gh auth login`
+3. **Authenticated**: Run `gh auth login --scopes "read:packages,write:packages,delete:packages"`
 4. **curl** (only needed if the script has to auto-install Docker Buildx)
 
 Run the dedicated checker any time to verify everything is ready:
@@ -176,10 +176,10 @@ After first push, make the GHCR package public so students can pull without auth
 Install from https://cli.github.com/
 
 **"Not authenticated with gh"**  
-Run `gh auth login` and complete browser authentication
+Run `gh auth login --scopes "read:packages,write:packages,delete:packages"` and complete browser authentication
 
 **"Permission denied" or "write:packages scope required"**  
-Your GitHub token needs the `write:packages` permission. Run `gh auth refresh -s write:packages` to add the required scope.
+Your GitHub token needs the correct package permissions. Run `gh auth refresh -s read:packages,write:packages,delete:packages` to add the required scopes.
 
 **"unknown flag: --name" when creating the builder**  
 Docker Buildx is missing or comes from a broken desktop symlink. The build script now auto-installs it into `~/.docker/cli-plugins/docker-buildx`, but if the download fails make sure `curl` is available and rerun the script.
