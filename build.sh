@@ -96,6 +96,26 @@ confirm() {
   fi
 }
 
+if $ASSUME_YES; then
+  export STUDENT_ENV_ASSUME_YES=true
+else
+  export STUDENT_ENV_ASSUME_YES=false
+fi
+
+NEEDS_PREREQS=false
+if $DO_BUILD || $DO_PUSH || $DO_CLEAN; then
+  NEEDS_PREREQS=true
+fi
+
+if $NEEDS_PREREQS; then
+  PREREQ_ARGS=()
+  if $ASSUME_YES; then
+    PREREQ_ARGS+=(-y)
+  fi
+  bash "$SCRIPT_DIR/scripts/prerequisites.sh" "${PREREQ_ARGS[@]}"
+  export STUDENT_ENV_PREREQS_OK=1
+fi
+
 # Handle --clean separately
 if $DO_CLEAN; then
   echo "════════════════════════════════════════════════════════════"

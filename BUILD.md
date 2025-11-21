@@ -47,6 +47,7 @@ bash scripts/build-container.sh [--no-cache]
 - Tags images as `ghcr.io/bguspl/student-env:VERSION` and `:latest`
 - Uses GHCR cache for faster builds (unless `--no-cache` is used)
 - Requires GitHub CLI (`gh`) for authentication
+- Automatically installs the Docker Buildx CLI plugin into `~/.docker/cli-plugins` if it's missing
 - Build time: ~2-3 min (amd64), ARM64 can take up to ~15 min
 
 ### `scripts/push-to-ghcr.sh`
@@ -73,6 +74,17 @@ bash scripts/generate-examples.sh
 - Keeps repository using `:latest` for local development
 
 All scripts support `--help` for detailed usage.
+
+### `scripts/prerequisites.sh`
+Validates that Docker, the GitHub CLI, curl, and the Docker Buildx plugin are ready.
+
+```bash
+bash scripts/prerequisites.sh [-y]
+```
+
+- Prints detected versions and highlights anything missing
+- Offers to install the Buildx plugin into `~/.docker/cli-plugins`
+- Automatically runs before `build.sh -b`, `build.sh -p`, and `build.sh --clean`
 
 ## How It Works
 
@@ -140,6 +152,15 @@ bash build.sh -a -y
 1. **Docker Desktop** (with WSL integration if on Windows) or Docker Engine
 2. **GitHub CLI** (`gh`): Install from https://cli.github.com/
 3. **Authenticated**: Run `gh auth login`
+4. **curl** (only needed if the script has to auto-install Docker Buildx)
+
+Run the dedicated checker any time to verify everything is ready:
+
+```bash
+bash scripts/prerequisites.sh      # add -y to auto-install curl/docker/gh/buildx when missing
+```
+
+`build.sh -b/-p/--clean` automatically invokes the checker, so missing pieces are reported before the real work starts.
 
 ## Making the Package Public
 
@@ -159,6 +180,9 @@ Run `gh auth login` and complete browser authentication
 
 **"Permission denied" or "write:packages scope required"**  
 Your GitHub token needs the `write:packages` permission. Run `gh auth refresh -s write:packages` to add the required scope.
+
+**"unknown flag: --name" when creating the builder**  
+Docker Buildx is missing or comes from a broken desktop symlink. The build script now auto-installs it into `~/.docker/cli-plugins/docker-buildx`, but if the download fails make sure `curl` is available and rerun the script.
 
 **"Docker daemon not reachable"**  
 Start Docker Desktop or check your Docker daemon

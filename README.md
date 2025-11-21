@@ -40,6 +40,9 @@ bash scripts/push-to-ghcr.sh
 
 # Generate examples.zip
 bash scripts/generate-examples.sh
+
+# Validate prerequisites (add -y to auto-install buildx if needed)
+bash scripts/prerequisites.sh
 ```
 
 Each script supports `--help` for detailed usage.
@@ -84,6 +87,7 @@ This way, the repository always uses `:latest` for convenience, but students get
 - Docker Desktop with WSL integration (Windows) or Docker Engine (Linux/Mac)
 - GitHub CLI (`gh`) - Install from https://cli.github.com/
 - Authenticated with GitHub: `gh auth login`
+- Run `scripts/prerequisites.sh` to double-check everything (use `-y` to auto-install curl, Docker Engine, gh, and the Buildx plugin when missing)
 
 ## Build Options
 

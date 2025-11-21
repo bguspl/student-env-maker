@@ -9,6 +9,14 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENV_FILE="$REPO_ROOT/.env"
 IMAGE_NAME="ghcr.io/bguspl/student-env"
 
+if [[ "${STUDENT_ENV_PREREQS_OK:-}" != "1" ]]; then
+  PREREQ_ARGS=()
+  if [[ "${STUDENT_ENV_ASSUME_YES:-false}" == "true" ]]; then
+    PREREQ_ARGS+=(-y)
+  fi
+  bash "$REPO_ROOT/scripts/prerequisites.sh" "${PREREQ_ARGS[@]}"
+fi
+
 usage() {
   cat <<-USAGE
 Usage: $(basename "$0")
