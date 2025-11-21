@@ -14,3 +14,7 @@ __pycache__/
 # Common example binaries
 examples/hello
 examples/Hello.class
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

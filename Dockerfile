@@ -11,6 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - Python: install Python 3.12 (from deadsnakes PPA) + pip, venv
 # - SQLite: sqlite3 client and development headers
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
         software-properties-common \
@@ -18,6 +19,7 @@ RUN apt-get update && \
         cmake \
         clang \
         valgrind \
+        gdb \
         git \
         wget \
         sudo \
