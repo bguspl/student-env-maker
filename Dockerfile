@@ -28,6 +28,7 @@ RUN apt-get update && \
         maven \
         sqlite3 \
         libsqlite3-dev \
+        libboost-all-dev \
         tzdata \
         curl && \
     rm -rf /var/lib/apt/lists/*
